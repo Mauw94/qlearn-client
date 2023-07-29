@@ -1,7 +1,58 @@
-<script>
+<script lang="ts">
 	import Counter from './Counter.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import { onMount } from 'svelte';
+	import { v4 as uuidv4 } from 'uuid';
+	import { appClientId } from '../globals';
+
+	let clientId: string = '';
+
+	async function setClientId() {
+		let id = uuidv4();
+		clientId = id;
+		console.log('client ID: ', clientId);
+		appClientId.set(id);
+	}
+
+	async function initQuestionsCache() {
+		try {
+			const baseUrl = 'http://localhost:3000/';
+			const response = await fetch(baseUrl + 'question/init/' + clientId, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+			if (response.ok) {
+			}
+		} catch (err) {
+			console.error('Error while initializing cache:', err);
+		}
+	}
+
+	async function fetchQuestions() {
+		try {
+			const baseUrl = 'http://localhost:3000/';
+			const response = await fetch(baseUrl + 'question/' + clientId, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+			if (response.ok) {
+				const data = await response.json();
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	onMount(() => {
+		setClientId();
+		initQuestionsCache();
+		fetchQuestions();
+	});
 </script>
 
 <svelte:head>

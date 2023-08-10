@@ -1,5 +1,7 @@
+import type { Difficulty } from "../domain/enum/difficulty.enum";
+
 export const baseUrl: string = "http://localhost:3000/question/";
-export const initCache: string = "init/"
+export const InitCache = (difficulty: Difficulty, clientId: string) => { return `init/${difficulty}/${clientId}` }
 export const fetchAll: string = "all/";
 export const next: string = "get_next/";
 export const Answer = (clientId: string, answer: string, questionId: string) => { return `answer/${clientId}/${answer}/${questionId}` }

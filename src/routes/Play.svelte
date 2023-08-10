@@ -10,9 +10,9 @@
 	} from '../services/question.service';
 	import type { Question } from '../domain/models/question.model';
 	import { DataFetchIsUndefinedOrEmpty } from '../infra/messages';
+	import { Difficulty } from '../domain/enum/difficulty.enum';
 
-	console.log('init play component');
-
+	let difficulty: Difficulty = Difficulty.EASY;
 	let clientId: string = '';
 	let question: Question | undefined;
 	let answerValue: string = '';
@@ -25,30 +25,57 @@
 	}
 
 	async function submitAnswer() {
-		console.log(answerValue);
 		answeredCorrectly = false;
 		const result = await answerQuestion(clientId, answerValue, question?.id as string);
 		if (result) {
 			answeredCorrectly = true;
 			answerValue = '';
 			question = await fetchNextQuestion(clientId);
-			// todo show show green stuff showing answer is correct etc
-			// todo next question
 		}
 	}
 
-	onMount(async () => {
-		await getClientId();
-		await initQuestionsCache(clientId);
+	async function setDifficulty(diff: Difficulty) {
+		difficulty = diff;
+		await setup();
+	}
+
+	async function setup() {
+		await initQuestionsCache(difficulty, clientId);
 		question = await fetchNextQuestion(clientId);
 		if (question === undefined) {
 			throw new Error(DataFetchIsUndefinedOrEmpty('question'));
 		}
-		console.log(question);
+	}
+	onMount(async () => {
+		await getClientId();
+		await setup();
+		const buttons = document.querySelectorAll('.square-button');
+		buttons.forEach((button) => {
+			button.addEventListener('click', () => {
+				// Remove active class from all buttons
+				buttons.forEach((btn) => btn.classList.remove('active'));
+				// Add active class to the clicked button
+				button.classList.add('active');
+			});
+		});
 	});
 </script>
 
 <div class="">
+	<div class="button-container">
+		<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
+			>Easy</button
+		>
+		<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}>Medium</button>
+		<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button>
+		<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
+			>Very hard</button
+		>
+		<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
+			>Einstein</button
+		>
+	</div>
+
 	<!-- svelte-ignore a11y-label-has-associated-control -->
 	<pre class="input-label">What is: {question?.question}?</pre>
 	<div class="input-field-container">
@@ -72,6 +99,37 @@
 </div>
 
 <style>
+	.button-container {
+		display: flex;
+		margin-bottom: 150px;
+	}
+
+	.square-button {
+		width: 75px;
+		height: 75px;
+		margin-right: 10px;
+		background-color: rgba(255, 255, 255, 0.7);
+		border: none;
+		color: white;
+		font-size: 16px;
+		cursor: pointer;
+		color: var(--color-text);
+		font-weight: 700;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		text-decoration: none;
+		transition: color 0.2s linear;
+	}
+
+	.square-button:hover {
+		color: var(--color-theme-1);
+	}
+
+	.active {
+		color: var(--color-theme-1);
+	}
+
 	.input-label {
 		margin-bottom: 20px;
 		font-weight: bold;

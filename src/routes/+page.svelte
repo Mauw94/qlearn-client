@@ -30,6 +30,6 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		flex: 1.6;
+		flex: 0.8;
 	}
 </style>

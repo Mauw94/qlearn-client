@@ -41,6 +41,7 @@
 
 	async function skip() {
 		question = await fetchNextQuestion(clientId);
+		console.log(question);
 		answerValue = '';
 	}
 
@@ -52,6 +53,7 @@
 	async function setup() {
 		await initQuestionsCache(difficulty, clientId);
 		question = await fetchNextQuestion(clientId);
+		console.log(question);
 		if (question === undefined) {
 			throw new Error(DataFetchIsUndefinedOrEmpty('question'));
 		}
@@ -62,6 +64,7 @@
 			submitAnswer();
 		}
 	}
+
 	onMount(async () => {
 		await getClientId();
 		await setup();

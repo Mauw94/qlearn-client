@@ -11,6 +11,7 @@
 	import type { Question } from '../domain/models/question.model';
 	import { DataFetchIsUndefinedOrEmpty } from '../infra/messages';
 	import { Difficulty } from '../domain/enum/difficulty.enum';
+	import '@fortawesome/fontawesome-free/css/all.css'; // Import Font Awesome CSS
 
 	let difficulty: Difficulty = Difficulty.EASY;
 	let clientId: string = '';
@@ -34,6 +35,10 @@
 		}
 	}
 
+	async function skip() {
+		question = await fetchNextQuestion(clientId);
+	}
+
 	async function setDifficulty(diff: Difficulty) {
 		difficulty = diff;
 		await setup();
@@ -44,6 +49,12 @@
 		question = await fetchNextQuestion(clientId);
 		if (question === undefined) {
 			throw new Error(DataFetchIsUndefinedOrEmpty('question'));
+		}
+	}
+
+	function handleEnter(event: any) {
+		if (event.key === 'Enter') {
+			submitAnswer();
 		}
 	}
 	onMount(async () => {
@@ -79,19 +90,25 @@
 	<!-- svelte-ignore a11y-label-has-associated-control -->
 	<pre class="input-label">What is: {question?.question}?</pre>
 	<div class="input-field-container">
-		<input type="text" class="input-field" bind:value={answerValue} placeholder="Answer..." />
-		<button class="submit-button" on:click={submitAnswer}><span class="icon">&#10003;</span></button
-		>
+		<input
+			type="text"
+			class="input-field"
+			on:keydown={handleEnter}
+			bind:value={answerValue}
+			placeholder="Answer..."
+		/>
+		<button class="submit-button" on:click={submitAnswer}><i class="fas fa-check" /></button>
+		<button class="skip-button" on:click={skip}><i class="fas fa-forward" /></button>
 	</div>
 
 	{#if answeredCorrectly}
 		<div
-			style="position: absolute; left: 50%; top: 30%"
+			style="position: absolute; left: 20%; top: 10%"
 			use:confetti={{
-				particleCount: $reduced_motion ? 0 : undefined,
-				force: 0.7,
-				stageWidth: window.innerWidth,
-				stageHeight: window.innerHeight,
+				particleCount: 50,
+				force: 1,
+				stageWidth: window.innerWidth - 200,
+				stageHeight: window.innerHeight / 2 + 200,
 				colors: ['#ff3e00', '#40b3ff', '#676778']
 			}}
 		/>
@@ -159,7 +176,14 @@
 		transition: background-color 0.3s;
 	}
 
-	.submit-button:hover {
-		background-color: #0056b3;
+	.skip-button {
+		margin-left: 5px;
+		padding: 10px 20px;
+		background-color: rgb(150, 145, 144);
+		color: white;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		transition: background-color 0.3s;
 	}
 </style>

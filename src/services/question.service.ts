@@ -68,8 +68,8 @@ export async function answerQuestion(clientId: string, answer: string, questionI
             }
         });
 
-        console.log(response.ok);
-        return response.ok ? true : false;
+        const result = await response.json();
+        return result ? true : false;
     } catch (err) {
         console.error(err);
     }

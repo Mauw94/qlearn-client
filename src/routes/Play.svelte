@@ -96,35 +96,37 @@
 </script>
 
 <div id="game" class="shake">
-	<div id="difficulties" class="button-container">
-		<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
-			>Easy</button
-		>
-		<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}>Medium</button>
-		<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button>
-		<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
-			>Very hard</button
-		>
-		<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
-			>Einstein</button
-		>
-	</div>
+	{#if question}
+		<div id="difficulties" class="button-container">
+			<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
+				>Easy</button
+			>
+			<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}>Medium</button
+			>
+			<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button>
+			<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
+				>Very hard</button
+			>
+			<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
+				>Einstein</button
+			>
+		</div>
 
-	<!-- svelte-ignore a11y-label-has-associated-control -->
-	<pre class="input-label">What is: {question?.question}?</pre>
-	<div class="input-field-container">
-		<input
-			id="answerField"
-			type="text"
-			class="input-field"
-			on:keydown={handleEnter}
-			bind:value={answerValue}
-			placeholder="Answer..."
-		/>
-		<button class="submit-button" on:click={submitAnswer}><i class="fas fa-check" /></button>
-		<button class="skip-button" on:click={skip}><i class="fas fa-forward" /></button>
-	</div>
-
+		<!-- svelte-ignore a11y-label-has-associated-control -->
+		<pre class="input-label">What is: {question?.question}?</pre>
+		<div class="input-field-container">
+			<input
+				id="answerField"
+				type="text"
+				class="input-field"
+				on:keydown={handleEnter}
+				bind:value={answerValue}
+				placeholder="Answer..."
+			/>
+			<button class="submit-button" on:click={submitAnswer}><i class="fas fa-check" /></button>
+			<button class="skip-button" on:click={skip}><i class="fas fa-forward" /></button>
+		</div>
+	{/if}
 	{#if answeredCorrectly}
 		<div
 			style="position: absolute; left: 20%; top: 10%"

@@ -14,7 +14,7 @@
 	<pre>QLearn</pre>
 
 	<p>
-		The questioned arithmetic operations will be further be improved upon. Then other areas of study
+		The questioned arithmetic operations will be further improved upon. Then other areas of study
 		will be implemented.
 	</p>
 </div>

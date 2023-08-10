@@ -1,6 +1,6 @@
 import { mapToDomain, mapToDomainList } from "../domain/mappers/question.mapper";
 import type { Question } from "../domain/models/question.model";
-import { baseUrl, fetchAll, initCache, nextQuestion } from "../infra/questions.api";
+import { Answer, baseUrl, fetchAll, initCache, next } from "../infra/questions.api";
 
 export async function initQuestionsCache(clientId: string): Promise<boolean> {
     try {
@@ -40,7 +40,7 @@ export async function fetchQuestions(clientId: string): Promise<Question[] | und
 
 export async function fetchNextQuestion(clientId: string): Promise<Question | undefined> {
     try {
-        const response = await fetch(baseUrl + nextQuestion + clientId, {
+        const response = await fetch(baseUrl + next + clientId, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -56,4 +56,22 @@ export async function fetchNextQuestion(clientId: string): Promise<Question | un
     }
 
     return undefined;
+}
+
+export async function answerQuestion(clientId: string, answer: string, questionId: string): Promise<boolean> {
+    try {
+        const response = await fetch(baseUrl + Answer(clientId, answer, questionId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log(response.ok);
+        return response.ok ? true : false;
+    } catch (err) {
+        console.error(err);
+    }
+
+    return false;
 }

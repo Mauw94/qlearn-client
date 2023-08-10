@@ -26,17 +26,22 @@
 	}
 
 	async function submitAnswer() {
+		if (answerValue.trim().length === 0) {
+			return;
+		}
 		answeredCorrectly = false;
 		const result = await answerQuestion(clientId, answerValue, question?.id as string);
 		if (result) {
 			answeredCorrectly = true;
 			answerValue = '';
 			question = await fetchNextQuestion(clientId);
+			console.log(question);
 		}
 	}
 
 	async function skip() {
 		question = await fetchNextQuestion(clientId);
+		answerValue = '';
 	}
 
 	async function setDifficulty(diff: Difficulty) {

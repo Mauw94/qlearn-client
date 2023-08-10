@@ -11,7 +11,7 @@
 	</main>
 
 	<footer>
-		<p>&copy; 2023 <a>MauwS</a>. All rights reserved.</p>
+		<p>&copy; 2023 <a href="/">MauwS</a>. All rights reserved.</p>
 	</footer>
 </div>
 

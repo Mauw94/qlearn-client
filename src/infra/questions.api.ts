@@ -1,6 +1,9 @@
 import type { Difficulty } from "../domain/enum/difficulty.enum";
 
-export const baseUrl: string = "http://localhost:3000/question/";
+export const BaseUrl = () => {
+    console.log(process.env.NODE_ENV);
+    return process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000/question/';
+}
 export const InitCache = (difficulty: Difficulty, clientId: string) => { return `init/${difficulty}/${clientId}` }
 export const fetchAll: string = "all/";
 export const next: string = "get_next/";

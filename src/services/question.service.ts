@@ -1,11 +1,11 @@
 import type { Difficulty } from "../domain/enum/difficulty.enum";
 import { mapToDomain, mapToDomainList } from "../domain/mappers/question.mapper";
 import type { Question } from "../domain/models/question.model";
-import { Answer, InitCache, baseUrl, fetchAll, next } from "../infra/questions.api";
+import { Answer, InitCache, BaseUrl, fetchAll, next } from "../infra/questions.api";
 
 export async function initQuestionsCache(difficulty: Difficulty, clientId: string): Promise<boolean> {
     try {
-        const response = await fetch(baseUrl + InitCache(difficulty, clientId), {
+        const response = await fetch(BaseUrl() + InitCache(difficulty, clientId), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -21,7 +21,7 @@ export async function initQuestionsCache(difficulty: Difficulty, clientId: strin
 
 export async function fetchQuestions(clientId: string): Promise<Question[] | undefined> {
     try {
-        const response = await fetch(baseUrl + fetchAll + clientId, {
+        const response = await fetch(BaseUrl() + fetchAll + clientId, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -41,7 +41,7 @@ export async function fetchQuestions(clientId: string): Promise<Question[] | und
 
 export async function fetchNextQuestion(clientId: string): Promise<Question | undefined> {
     try {
-        const response = await fetch(baseUrl + next + clientId, {
+        const response = await fetch(BaseUrl() + next + clientId, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -61,7 +61,7 @@ export async function fetchNextQuestion(clientId: string): Promise<Question | un
 
 export async function answerQuestion(clientId: string, answer: string, questionId: string): Promise<boolean> {
     try {
-        const response = await fetch(baseUrl + Answer(clientId, answer, questionId), {
+        const response = await fetch(BaseUrl() + Answer(clientId, answer, questionId), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

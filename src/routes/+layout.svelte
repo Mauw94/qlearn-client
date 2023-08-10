@@ -11,7 +11,7 @@
 	</main>
 
 	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>&copy; 2023 <a>MauwS</a>. All rights reserved.</p>
 	</footer>
 </div>
 
@@ -34,15 +34,12 @@
 	}
 
 	footer {
+		font-size: 13px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
+		padding: 10px;
 	}
 
 	@media (min-width: 480px) {

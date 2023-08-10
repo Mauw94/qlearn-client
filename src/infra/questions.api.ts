@@ -1,7 +1,6 @@
 import type { Difficulty } from "../domain/enum/difficulty.enum";
 
 export const BaseUrl = () => {
-    console.log(process.env.NODE_ENV);
     return process.env.NODE_ENV === 'production' ? 'https://qlearn-server.azurewebsites.net/question/' : 'http://localhost:3000/question/';
 }
 export const InitCache = (difficulty: Difficulty, clientId: string) => { return `init/${difficulty}/${clientId}` }

@@ -29,6 +29,7 @@
 		if (answerValue.trim().length === 0) {
 			return;
 		}
+
 		answeredCorrectly = false;
 		const result = await answerQuestion(clientId, answerValue, question?.id as string);
 		if (result) {
@@ -36,6 +37,9 @@
 			answerValue = '';
 			question = await fetchNextQuestion(clientId);
 			console.log(question);
+		} else {
+			const element = document.getElementById('answerField');
+			addShakeAnimation(element);
 		}
 	}
 
@@ -47,6 +51,8 @@
 
 	async function setDifficulty(diff: Difficulty) {
 		difficulty = diff;
+		const element = document.getElementById('difficulties');
+		addShakeAnimation(element);
 		await setup();
 	}
 
@@ -65,6 +71,15 @@
 		}
 	}
 
+	function addShakeAnimation(element: HTMLElement | null) {
+		if (element === null) return;
+
+		element.classList.add('shake');
+		setTimeout(() => {
+			element.classList.remove('shake');
+		}, 1000);
+	}
+
 	onMount(async () => {
 		await getClientId();
 		await setup();
@@ -80,8 +95,8 @@
 	});
 </script>
 
-<div class="">
-	<div class="button-container">
+<div id="game" class="shake">
+	<div id="difficulties" class="button-container">
 		<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
 			>Easy</button
 		>
@@ -99,6 +114,7 @@
 	<pre class="input-label">What is: {question?.question}?</pre>
 	<div class="input-field-container">
 		<input
+			id="answerField"
 			type="text"
 			class="input-field"
 			on:keydown={handleEnter}
@@ -124,6 +140,24 @@
 </div>
 
 <style>
+	.shake {
+		animation: shake 1s ease-in-out;
+	}
+
+	@keyframes shake {
+		0%,
+		100% {
+			transform: translateX(0);
+		}
+		25%,
+		75% {
+			transform: translateX(-10px);
+		}
+		50% {
+			transform: translateX(10px);
+		}
+	}
+
 	.button-container {
 		display: flex;
 		margin-bottom: 150px;

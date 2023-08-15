@@ -1,11 +1,11 @@
 import type { Difficulty } from "../domain/enum/difficulty.enum";
 import { mapToDomain, mapToDomainList } from "../domain/mappers/question.mapper";
 import type { Question } from "../domain/models/question.model";
-import { Answer, InitCache, BaseUrl, fetchAll, next } from "../infra/questions.api";
+import { Answer, InitMathArithmeticQuestionsCache, BaseUrl, fetchAll, next } from "../infra/questions.api";
 
 export async function initQuestionsCache(difficulty: Difficulty, clientId: string): Promise<boolean> {
     try {
-        const response = await fetch(BaseUrl() + InitCache(difficulty, clientId), {
+        const response = await fetch(BaseUrl() + InitMathArithmeticQuestionsCache(difficulty, clientId), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

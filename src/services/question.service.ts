@@ -1,11 +1,27 @@
 import type { Difficulty } from "../domain/enum/difficulty.enum";
 import { mapToDomain, mapToDomainList } from "../domain/mappers/question.mapper";
 import type { Question } from "../domain/models/question.model";
-import { Answer, InitMathArithmeticQuestionsCache, BaseUrl, fetchAll, next } from "../infra/questions.api";
+import { Answer, InitMathArithmeticQuestionsCache, BaseUrl, fetchAll, next, InitHistoryQuestionsCache } from "../infra/questions.api";
 
-export async function initQuestionsCache(difficulty: Difficulty, clientId: string): Promise<boolean> {
+export async function initMathArithmeticQuestionsCache(difficulty: Difficulty, clientId: string): Promise<boolean> {
     try {
         const response = await fetch(BaseUrl() + InitMathArithmeticQuestionsCache(difficulty, clientId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.ok ? true : false;
+    } catch (err) {
+        console.error('Error while initializing cache:', err);
+    }
+
+    return false;
+}
+
+export async function initHistoryQuestionsCache(clientId: string): Promise<boolean> {
+    try {
+        const response = await fetch(BaseUrl() + InitHistoryQuestionsCache(clientId), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

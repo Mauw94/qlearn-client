@@ -6,12 +6,16 @@
 	import {
 		answerQuestion,
 		fetchNextQuestion,
-		initQuestionsCache
+		initHistoryQuestionsCache,
+		initMathArithmeticQuestionsCache
 	} from '../services/question.service';
 	import type { Question } from '../domain/models/question.model';
 	import { DataFetchIsUndefinedOrEmpty } from '../infra/messages';
 	import { Difficulty } from '../domain/enum/difficulty.enum';
 	import '@fortawesome/fontawesome-free/css/all.css'; // Import Font Awesome CSS
+	import { Subject } from '../domain/enum/subject.enum';
+
+	export let subject: Subject;
 
 	let difficulty: Difficulty = Difficulty.EASY;
 	let clientId: string = '';
@@ -57,7 +61,17 @@
 	}
 
 	async function setup() {
-		await initQuestionsCache(difficulty, clientId);
+		switch (subject) {
+			case Subject.MathArithmetic:
+				console.log('math questions');
+				await initMathArithmeticQuestionsCache(difficulty, clientId);
+				break;
+			case Subject.History:
+				console.log('history questions');
+				await initHistoryQuestionsCache(clientId);
+				break;
+		}
+
 		question = await fetchNextQuestion(clientId);
 		console.log(question);
 		if (question === undefined) {
@@ -97,21 +111,23 @@
 
 <div id="game" class="shake">
 	{#if question}
-		<div id="difficulties" class="button-container">
-			<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
-				>Easy</button
-			>
-			<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}>Medium</button
-			>
-			<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button>
-			<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
-				>Very hard</button
-			>
-			<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
-				>Einstein</button
-			>
-		</div>
-
+		{#if subject == Subject.MathArithmetic}
+			<div id="difficulties" class="button-container">
+				<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
+					>Easy</button
+				>
+				<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}
+					>Medium</button
+				>
+				<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button>
+				<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
+					>Very hard</button
+				>
+				<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
+					>Einstein</button
+				>
+			</div>
+		{/if}
 		<!-- svelte-ignore a11y-label-has-associated-control -->
 		<pre class="input-label">What is: {question?.question}?</pre>
 		<div class="input-field-container">

@@ -14,6 +14,8 @@
 	import { Difficulty } from '../domain/enum/difficulty.enum';
 	import '@fortawesome/fontawesome-free/css/all.css'; // Import Font Awesome CSS
 	import { Subject } from '../domain/enum/subject.enum';
+	import Spinner from './Spinner.svelte';
+	import Confetti from './Confetti.svelte';
 
 	export let subject: Subject;
 
@@ -22,6 +24,7 @@
 	let question: Question | undefined;
 	let answerValue: string = '';
 	let answeredCorrectly: boolean = false;
+	let isLoading: boolean = false;
 
 	async function getClientId() {
 		appClientId.subscribe((res) => {
@@ -63,6 +66,7 @@
 	}
 
 	async function setup() {
+		isLoading = true;
 		switch (subject) {
 			case Subject.MathArithmetic:
 				console.log('math questions');
@@ -73,6 +77,7 @@
 				await initHistoryQuestionsCache(clientId);
 				break;
 		}
+		isLoading = false;
 
 		question = await fetchNextQuestion(clientId);
 		console.log(question);
@@ -111,51 +116,47 @@
 	});
 </script>
 
-<div id="game" class="shake">
-	{#if question}
-		{#if subject == Subject.MathArithmetic}
-			<div id="difficulties" class="button-container">
-				<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
-					>Easy</button
-				>
-				<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}
-					>Medium</button
-				>
-				<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button>
-				<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
-					>Very hard</button
-				>
-				<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
-					>Einstein</button
-				>
+<div>
+	{#if isLoading}
+		<Spinner />
+	{:else}
+		<span id="game" class="shake">
+			{#if subject == Subject.MathArithmetic}
+				<div id="difficulties" class="button-container">
+					<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
+						>Easy</button
+					>
+					<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}
+						>Medium</button
+					>
+					<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button
+					>
+					<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
+						>Very hard</button
+					>
+					<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
+						>Einstein</button
+					>
+				</div>
+			{/if}
+			<!-- svelte-ignore a11y-label-has-associated-control -->
+			<pre class="input-label">What is: {question?.question}?</pre>
+			<div class="input-field-container">
+				<input
+					id="answerField"
+					type="text"
+					class="input-field"
+					on:keydown={handleEnter}
+					bind:value={answerValue}
+					placeholder="Answer..."
+				/>
+				<button class="submit-button" on:click={submitAnswer}><i class="fas fa-check" /></button>
+				<button class="skip-button" on:click={skip}><i class="fas fa-forward" /></button>
 			</div>
-		{/if}
-		<!-- svelte-ignore a11y-label-has-associated-control -->
-		<pre class="input-label">What is: {question?.question}?</pre>
-		<div class="input-field-container">
-			<input
-				id="answerField"
-				type="text"
-				class="input-field"
-				on:keydown={handleEnter}
-				bind:value={answerValue}
-				placeholder="Answer..."
-			/>
-			<button class="submit-button" on:click={submitAnswer}><i class="fas fa-check" /></button>
-			<button class="skip-button" on:click={skip}><i class="fas fa-forward" /></button>
-		</div>
-	{/if}
-	{#if answeredCorrectly}
-		<div
-			style="position: absolute; left: 20%; top: 10%"
-			use:confetti={{
-				particleCount: 50,
-				force: 1,
-				stageWidth: window.innerWidth - 200,
-				stageHeight: window.innerHeight / 2 + 200,
-				colors: ['#ff3e00', '#40b3ff', '#676778']
-			}}
-		/>
+			{#if answeredCorrectly}
+				<Confetti />
+			{/if}
+		</span>
 	{/if}
 </div>
 

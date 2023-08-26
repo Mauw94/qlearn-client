@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { confetti } from '@neoconfetti/svelte';
-	import { reduced_motion } from './sverdle/reduced-motion';
 	import { onMount } from 'svelte';
 	import { appClientId } from '../globals';
 	import {
@@ -16,6 +14,8 @@
 	import { Subject } from '../domain/enum/subject.enum';
 	import Spinner from './Spinner.svelte';
 	import Confetti from './Confetti.svelte';
+	import ErrorDisplay from './ErrorDisplay.svelte';
+	import PlayAgainPromp from './PlayAgainPromp.svelte';
 
 	export let subject: Subject;
 
@@ -25,6 +25,8 @@
 	let answerValue: string = '';
 	let answeredCorrectly: boolean = false;
 	let isLoading: boolean = false;
+	let roundIsDone: boolean = false;
+	let errorInInit: boolean = false;
 
 	async function getClientId() {
 		appClientId.subscribe((res) => {
@@ -45,6 +47,11 @@
 			answeredCorrectly = true;
 			answerValue = '';
 			question = await fetchNextQuestion(clientId);
+			if (question === undefined) {
+				// TODO: this means we ran out of questions
+				// and need to show some end of round info
+				roundIsDone = true;
+			}
 			console.log(question);
 		} else {
 			const element = document.getElementById('answerField');
@@ -54,6 +61,11 @@
 
 	async function skip() {
 		question = await fetchNextQuestion(clientId);
+		if (question === undefined) {
+			// TODO: this means we ran out of questions
+			// and need to show some end of round info
+			roundIsDone = true;
+		}
 		console.log(question);
 		answerValue = '';
 	}
@@ -67,16 +79,24 @@
 
 	async function setup() {
 		isLoading = true;
+		let init: boolean = false;
 		switch (subject) {
 			case Subject.MathArithmetic:
 				console.log('math questions');
-				await initMathArithmeticQuestionsCache(difficulty, clientId);
+				init = await initMathArithmeticQuestionsCache(difficulty, clientId);
 				break;
 			case Subject.History:
 				console.log('history questions');
-				await initHistoryQuestionsCache(clientId);
+				init = await initHistoryQuestionsCache(clientId);
 				break;
 		}
+
+		if (!init) {
+			errorInInit = true;
+			isLoading = false;
+			return;
+		}
+
 		isLoading = false;
 
 		question = await fetchNextQuestion(clientId);
@@ -119,42 +139,50 @@
 <div>
 	{#if isLoading}
 		<Spinner />
+	{:else if errorInInit}
+		<ErrorDisplay />
 	{:else}
 		<span id="game" class="shake">
-			{#if subject == Subject.MathArithmetic}
-				<div id="difficulties" class="button-container">
-					<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
-						>Easy</button
-					>
-					<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}
-						>Medium</button
-					>
-					<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}>Hard</button
-					>
-					<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
-						>Very hard</button
-					>
-					<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
-						>Einstein</button
-					>
+			{#if !roundIsDone}
+				{#if subject == Subject.MathArithmetic}
+					<div id="difficulties" class="button-container">
+						<button class="square-button active" on:click={() => setDifficulty(Difficulty.EASY)}
+							>Easy</button
+						>
+						<button class="square-button" on:click={() => setDifficulty(Difficulty.MEDIUM)}
+							>Medium</button
+						>
+						<button class="square-button" on:click={() => setDifficulty(Difficulty.HARD)}
+							>Hard</button
+						>
+						<button class="square-button" on:click={() => setDifficulty(Difficulty.VERY_HARD)}
+							>Very hard</button
+						>
+						<button class="square-button" on:click={() => setDifficulty(Difficulty.EINSTEIN)}
+							>Einstein</button
+						>
+					</div>
+				{/if}
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<pre class="input-label">What is: {question?.question}?</pre>
+				<div class="input-field-container">
+					<input
+						id="answerField"
+						type="text"
+						class="input-field"
+						on:keydown={handleEnter}
+						bind:value={answerValue}
+						placeholder="Answer..."
+					/>
+					<button class="submit-button" on:click={submitAnswer}><i class="fas fa-check" /></button>
+					<button class="skip-button" on:click={skip}><i class="fas fa-forward" /></button>
 				</div>
+				{#if answeredCorrectly}
+					<Confetti />
+				{/if}
 			{/if}
-			<!-- svelte-ignore a11y-label-has-associated-control -->
-			<pre class="input-label">What is: {question?.question}?</pre>
-			<div class="input-field-container">
-				<input
-					id="answerField"
-					type="text"
-					class="input-field"
-					on:keydown={handleEnter}
-					bind:value={answerValue}
-					placeholder="Answer..."
-				/>
-				<button class="submit-button" on:click={submitAnswer}><i class="fas fa-check" /></button>
-				<button class="skip-button" on:click={skip}><i class="fas fa-forward" /></button>
-			</div>
-			{#if answeredCorrectly}
-				<Confetti />
+			{#if roundIsDone}
+				<PlayAgainPromp />
 			{/if}
 		</span>
 	{/if}
